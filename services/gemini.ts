@@ -1,8 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
-
-const ai = new GoogleGenAI({ apiKey });
+// The API key must be obtained exclusively from the environment variable process.env.API_KEY
+// as per the coding guidelines.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Helper to get schema for a single card structure
 const cardSchema = {
@@ -17,7 +17,8 @@ const cardSchema = {
 };
 
 export const generateFlashcardContent = async (character: string) => {
-  const model = 'gemini-2.5-flash-latest';
+  // Updated model to the recommended one for text tasks
+  const model = 'gemini-3-flash-preview';
 
   const prompt = `
     Analyse le caractère chinois : ${character}.
@@ -43,7 +44,8 @@ export const generateFlashcardContent = async (character: string) => {
 };
 
 export const generateDailyLesson = async (excludeCharacters: string[] = []) => {
-  const model = 'gemini-2.5-flash-latest';
+  // Updated model to the recommended one for text tasks
+  const model = 'gemini-3-flash-preview';
 
   // On limite la liste d'exclusion pour ne pas surcharger le prompt si la base devient énorme,
   // mais pour une classe c'est généralement ok.
