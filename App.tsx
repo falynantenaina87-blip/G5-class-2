@@ -288,8 +288,18 @@ const FlashcardsView = ({ user }: { user: any }) => {
     const newCardsData = await generateDailyLesson(existingChars);
     
     if (newCardsData && Array.isArray(newCardsData) && newCardsData.length > 0) {
+      // Data Sanitization: Ensure example_sentence is never null to satisfy DB constraints
+      // This protects against "violates not-null constraint" errors if AI misses a field
+      const sanitizedData = newCardsData.map((c: any) => ({
+        character: c.character,
+        pinyin: c.pinyin,
+        translation: c.translation,
+        // ENHANCED SAFETY: Ensure it's a string and not empty/null
+        example_sentence: (c.example_sentence && typeof c.example_sentence === 'string') ? c.example_sentence : " "
+      }));
+
       // Insert all at once
-      const { error } = await supabase.from('flashcards').insert(newCardsData);
+      const { error } = await supabase.from('flashcards').insert(sanitizedData);
       
       if (error) {
         alert("Erreur lors de l'enregistrement: " + error.message);

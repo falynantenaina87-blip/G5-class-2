@@ -16,9 +16,18 @@ CREATE TABLE IF NOT EXISTS flashcards (
     character TEXT NOT NULL,
     pinyin TEXT NOT NULL,
     translation TEXT NOT NULL,
-    example_sentence TEXT,
+    example_sentence TEXT, -- Initially created without constraint in this script, but existing DB might differ
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- CORRECTION DU BUG "COLUMN NOT FOUND" :
+-- Exécutez cette ligne pour ajouter la colonne manquante si la table existe déjà sans elle.
+ALTER TABLE flashcards ADD COLUMN IF NOT EXISTS example_sentence TEXT;
+
+-- CORRECTION DU BUG "VIOLATES NOT-NULL CONSTRAINT" (CRITIQUE) :
+-- Cette commande est INDISPENSABLE pour réparer l'erreur actuelle.
+-- Elle autorise la colonne à être vide (NULL) si l'IA ne renvoie pas de phrase.
+ALTER TABLE flashcards ALTER COLUMN example_sentence DROP NOT NULL;
 
 -- Schedule Table
 CREATE TABLE IF NOT EXISTS schedule (
@@ -48,15 +57,29 @@ ALTER TABLE schedule ENABLE ROW LEVEL SECURITY;
 ALTER TABLE homework ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Public Read (Anon Key can read everything)
+DROP POLICY IF EXISTS "Public Read Announcements" ON announcements;
 CREATE POLICY "Public Read Announcements" ON announcements FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read Flashcards" ON flashcards;
 CREATE POLICY "Public Read Flashcards" ON flashcards FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read Schedule" ON schedule;
 CREATE POLICY "Public Read Schedule" ON schedule FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read Homework" ON homework;
 CREATE POLICY "Public Read Homework" ON homework FOR SELECT USING (true);
 
 -- Policy: Authenticated Modify (Logged in users can Insert/Update/Delete)
+DROP POLICY IF EXISTS "Auth Modify Announcements" ON announcements;
 CREATE POLICY "Auth Modify Announcements" ON announcements FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Auth Modify Flashcards" ON flashcards;
 CREATE POLICY "Auth Modify Flashcards" ON flashcards FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Auth Modify Schedule" ON schedule;
 CREATE POLICY "Auth Modify Schedule" ON schedule FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Auth Modify Homework" ON homework;
 CREATE POLICY "Auth Modify Homework" ON homework FOR ALL USING (auth.role() = 'authenticated');
 
 -- IMPORTANT: User Creation Instruction
