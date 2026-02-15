@@ -1,8 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-// The API key must be obtained exclusively from the environment variable process.env.API_KEY
-// as per the coding guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// CORRECTION CRITIQUE POUR VERCEL :
+// Remplacement de process.env.API_KEY par import.meta.env.VITE_API_KEY
+// "process" n'est pas défini dans le navigateur, ce qui cause l'écran blanc.
+const apiKey = (import.meta as any).env.VITE_API_KEY || '';
+
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
 // Helper to get schema for a single card structure
 const cardSchema = {
