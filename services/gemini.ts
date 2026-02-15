@@ -3,7 +3,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 // CORRECTION CRITIQUE POUR VERCEL :
 // Remplacement de process.env.API_KEY par import.meta.env.VITE_API_KEY
 // "process" n'est pas défini dans le navigateur, ce qui cause l'écran blanc.
-const apiKey = (import.meta as any).env.VITE_API_KEY || '';
+const apiKey = (import.meta as any).env.VITE_API_KEY || 'placeholder_key_to_avoid_crash';
 
 const ai = new GoogleGenAI({ apiKey: apiKey });
 
@@ -22,6 +22,12 @@ const cardSchema = {
 export const generateFlashcardContent = async (character: string) => {
   // Updated model to the recommended one for text tasks
   const model = 'gemini-3-flash-preview';
+
+  // Prevent API call if key is missing
+  if (apiKey === 'placeholder_key_to_avoid_crash') {
+    console.warn("API Key is missing. Please set VITE_API_KEY.");
+    return null;
+  }
 
   const prompt = `
     Analyse le caractère chinois : ${character}.
@@ -49,6 +55,12 @@ export const generateFlashcardContent = async (character: string) => {
 export const generateDailyLesson = async (excludeCharacters: string[] = []) => {
   // Updated model to the recommended one for text tasks
   const model = 'gemini-3-flash-preview';
+
+  // Prevent API call if key is missing
+  if (apiKey === 'placeholder_key_to_avoid_crash') {
+    console.warn("API Key is missing. Please set VITE_API_KEY.");
+    return [];
+  }
 
   // On limite la liste d'exclusion pour ne pas surcharger le prompt si la base devient énorme,
   // mais pour une classe c'est généralement ok.
