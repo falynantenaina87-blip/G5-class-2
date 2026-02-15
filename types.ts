@@ -13,6 +13,7 @@ export interface Flashcard {
   pinyin: string;
   translation: string;
   example_sentence?: string;
+  created_at?: string;
 }
 
 export interface ScheduleItem {
